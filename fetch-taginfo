@@ -1,0 +1,3 @@
+#! /bin/bash
+
+curl https://taginfo.openstreetmap.org/api/4/key/values?key=wikimedia_commons
