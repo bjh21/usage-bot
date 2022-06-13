@@ -1,9 +1,0 @@
-[out:json];
-// gather results
-(
-  node["wikimedia_commons"~"(^|;)File:",i];
-  way["wikimedia_commons"~"(^|;)^File:",i];
-  relation["wikimedia_commons"~"(^|;)File:",i];
-);
-// print results
-out tags qt;

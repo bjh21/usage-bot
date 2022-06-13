@@ -1,4 +1,0 @@
-#! /bin/bash
-set -euo pipefail
-
-curl --data-urlencode data@query.opql "http://overpass-api.de/api/interpreter" 
