@@ -1,8 +1,9 @@
+import pywikibot.comms.http as http
 import re
 from urllib.parse import urlencode
 
-def from_taginfo(session):
-    r = session.get("https://taginfo.openstreetmap.org/api/4/key/values"
+def from_taginfo():
+    r = http.fetch("https://taginfo.openstreetmap.org/api/4/key/values"
                     "?key=wikimedia_commons")
     r.raise_for_status()
     j = r.json()
@@ -10,7 +11,7 @@ def from_taginfo(session):
     for v in j["data"]:
         if re.match("^File:", v["value"], re.IGNORECASE):
             params = urlencode(dict(key="wikimedia_commons", value=v["value"]))
-            tiurl = "https://https://taginfo.openstreetmap.org/tags/?" + params
+            tiurl = "https://taginfo.openstreetmap.org/tags/?" + params
             files[v['value']] = f"[{tiurl} {v['count']} use(s)]"
     return files
 
@@ -26,9 +27,9 @@ oplq = """
 out tags qt;
 """
 
-def from_overpass(session):
-    r = session.get("https://overpass-api.de/api/interpreter",
-                    params={'data': oplq})
+def from_overpass():
+    r = http.fetch("https://overpass-api.de/api/interpreter",
+                   params={'data': oplq})
     r.raise_for_status()
     j = r.json()
     files = {}

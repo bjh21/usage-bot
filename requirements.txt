@@ -1,0 +1,5 @@
+# pip requirements for running usage-bot
+more_itertools
+pywikibot >= 7.0.0
+requests
+requests-oauthlib
