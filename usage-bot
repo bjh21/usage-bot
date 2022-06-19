@@ -13,7 +13,7 @@ def usage_bot():
     for i, chunk in enumerate(sliced(sorted(files.items()), 1000),
                               start = gallery_number):
         gallery = pywikibot.Page(site, f"{base_gallery}/{i}")
-        gallery.text = ("<gallery>\n" +
+        gallery.text = ("{{../header}}\n<gallery>\n" +
                         "".join([f"{filename}|{caption}\n"
                                  for filename, caption in chunk]) +
                         "</gallery>\n")
