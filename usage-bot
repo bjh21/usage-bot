@@ -3,12 +3,16 @@
 from more_itertools import sliced
 import pywikibot
 
+from usage_bot.instantcommons import from_instantcommons
 from usage_bot.osm import from_taginfo, from_overpass
 
 def usage_bot():
+    update_galleries(from_taginfo(), "User:Usage Bot/Used on OSM")
+    update_galleries(from_instantcommons(pywikibot.Site("wikitech:en")),
+                     "User:Usage Bot/Used on wikitech")
+
+def update_galleries(files, base_gallery):
     site = pywikibot.Site()
-    files = from_taginfo()
-    base_gallery = "User:Usage Bot/Used on OSM"
     gallery_number = 1
     for i, chunk in enumerate(sliced(sorted(files.items()), 1000),
                               start = gallery_number):
