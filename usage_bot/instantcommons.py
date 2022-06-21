@@ -10,5 +10,5 @@ def from_instantcommons(site):
     for f in g:
         if f['imagerepository'] == 'wikimediacommons':
             files[f['title']] = (
-                f"[{f['fullurl']} {f['title']}")
+                f"[{f['fullurl']} {f['title']}]")
     return files
