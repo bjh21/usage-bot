@@ -21,6 +21,9 @@ def update_galleries(files, base_gallery):
                         "".join([f"{filename}|{caption}\n"
                                  for filename, caption in chunk]) +
                         "</gallery>\n")
+        if i == 1:
+            with open(base_gallery, 'w') as f:
+                print(gallery.text, end='', file=f)
         gallery.save("Files currently in use by OSM")
 
 def main(*args):
