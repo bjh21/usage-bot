@@ -20,11 +20,16 @@ def get_existing_galleries(base_gallery):
     gen = pg.PrefixingPageGenerator(f"{base_gallery}/", content=True)
     gen = pg.RegexFilterPageGenerator(gen, fr"^{re.escape(base_gallery)}/\d+",
                                       ignore_namespace=False)
+    files = set()
     for p in gen:
         tree = mwparserfromhell.parse(p.text)
         for gall in [tag for tag in tree.filter_tags()
                      if tag.tag == "gallery"]:
-            print(gall.contents)
+            # I don't think mwparserfromhell understands the contents
+            # of <gallery>, so we have to parse it ourselves.
+            for line in gall.contents.splitlines():
+                files.add(line.split('|', 1)[0])
+    return files
 
 def update_galleries(files, base_gallery):
     site = pywikibot.Site()
