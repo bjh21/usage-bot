@@ -2,14 +2,24 @@
 
 from more_itertools import sliced
 import pywikibot
+import pywikibot.pagegenerators as pg
+import re
 
 from usage_bot.instantcommons import from_instantcommons
 from usage_bot.osm import from_taginfo, from_overpass
 
 def usage_bot():
-    update_galleries(from_taginfo(), "User:Usage Bot/Used on OSM")
-    update_galleries(from_instantcommons(pywikibot.Site("wikitech:en")),
-                     "User:Usage Bot/Used on wikitech")
+    #update_galleries(from_taginfo(), "User:Usage Bot/Used on OSM")
+    #update_galleries(from_instantcommons(pywikibot.Site("wikitech:en")),
+    #                 "User:Usage Bot/Used on wikitech")
+    get_existing_galleries("User:Usage Bot/Used on OSM")
+    get_existing_galleries("User:Usage Bot/Used on wikitech")
+
+def get_existing_galleries(base_gallery):
+    g = pg.PrefixingPageGenerator(f"{base_gallery}/", content=True)
+    g = pg.RegexFilterPageGenerator(g, fr"^{re.escape(base_gallery)}/\d+",
+                                    ignore_namespace=False)
+    print(list(g))
 
 def update_galleries(files, base_gallery):
     site = pywikibot.Site()
