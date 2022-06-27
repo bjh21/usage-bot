@@ -3,6 +3,7 @@
 from more_itertools import sliced
 import pywikibot
 import pywikibot.pagegenerators as pg
+import mwparserfromhell
 import re
 
 from usage_bot.instantcommons import from_instantcommons
@@ -16,10 +17,15 @@ def usage_bot():
     get_existing_galleries("User:Usage Bot/Used on wikitech")
 
 def get_existing_galleries(base_gallery):
-    g = pg.PrefixingPageGenerator(f"{base_gallery}/", content=True)
-    g = pg.RegexFilterPageGenerator(g, fr"^{re.escape(base_gallery)}/\d+",
-                                    ignore_namespace=False)
-    print(list(g))
+    gen = pg.PrefixingPageGenerator(f"{base_gallery}/", content=True)
+    gen = pg.RegexFilterPageGenerator(gen, fr"^{re.escape(base_gallery)}/\d+",
+                                      ignore_namespace=False)
+    for p in gen:
+        tree = mwparserfromhell.parse(p.text)
+        # Assume there's only one gallery
+        for gall in [tag for tag in tree.filter_tags()
+                     if tag.tag == "gallery"]:
+            print(gall.contents)
 
 def update_galleries(files, base_gallery):
     site = pywikibot.Site()
