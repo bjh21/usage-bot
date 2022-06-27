@@ -22,7 +22,6 @@ def get_existing_galleries(base_gallery):
                                       ignore_namespace=False)
     for p in gen:
         tree = mwparserfromhell.parse(p.text)
-        # Assume there's only one gallery
         for gall in [tag for tag in tree.filter_tags()
                      if tag.tag == "gallery"]:
             print(gall.contents)
