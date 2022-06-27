@@ -13,23 +13,26 @@ def usage_bot():
     #update_galleries(from_taginfo(), "User:Usage Bot/Used on OSM")
     #update_galleries(from_instantcommons(pywikibot.Site("wikitech:en")),
     #                 "User:Usage Bot/Used on wikitech")
-    get_existing_galleries("User:Usage Bot/Used on OSM")
-    get_existing_galleries("User:Usage Bot/Used on wikitech")
+    print(get_existing_galleries("User:Usage Bot/Used on OSM"))
+    print(get_existing_galleries("User:Usage Bot/Used on wikitech"))
 
 def get_existing_galleries(base_gallery):
     gen = pg.PrefixingPageGenerator(f"{base_gallery}/", content=True)
     gen = pg.RegexFilterPageGenerator(gen, fr"^{re.escape(base_gallery)}/\d+",
                                       ignore_namespace=False)
-    files = set()
+    gallery_files = { }
     for p in gen:
+        files = set()
         tree = mwparserfromhell.parse(p.text)
         for gall in [tag for tag in tree.filter_tags()
                      if tag.tag == "gallery"]:
             # I don't think mwparserfromhell understands the contents
             # of <gallery>, so we have to parse it ourselves.
             for line in gall.contents.splitlines():
-                files.add(line.split('|', 1)[0])
-    return files
+                files.add(line.split('|', 1)[0].strip())
+        files.discard('') # Blank lines in galleries are ignored
+        gallery_files[int(p.title().split('/')[-1])] = files
+    return gallery_files
 
 def update_galleries(files, base_gallery):
     site = pywikibot.Site()
