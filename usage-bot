@@ -43,21 +43,36 @@ def update_galleries(files, base_gallery):
             f"{sum(map(len, gallery_files.values()))} "
             "files in galleries already")
     files_set = set(files.keys())
-    added_files_queue = sorted(files_set.difference(*gallery_files.values()),
-                               reverse=True)
+    # Find the files we want that aren't in any gallery.
+    added_files_queue = sorted(files_set.difference(*gallery_files.values()))
     bot.log(f"{base_gallery}: {len(added_files_queue)} new files")
-    # First pass: find galleries that must be edited to remove files
-    for n, these_old_files in sorted(gallery_files.items()):
-        if these_old_files - files_set:
+    # First pass: find galleries that must be edited to remove files,
+    # remove those files, and fill the galleries up.
+    for n, these_files in sorted(gallery_files.items()):
+        if these_files - files_set:
             bot.log(f"{base_gallery}/{n} needs files removed")
-            these_new_files = these_old_files & files_set
-            space = MAX_FILES_PER_GALLERY - len(these_new_files)
+            these_files.intersection_update(files_set)
+            space = MAX_FILES_PER_GALLERY - len(these_files)
             bot.log(f"{base_gallery}/{n} has room for {space} more files")
-            these_new_files.update(added_files_queue[-space:])
-            del added_files_queue[-space:]
-    if len(added_files_queue) > 0:
-        bot.log(f"{base_gallery}: {len(added_files_queue)} files still to add")
-            
+            these_files.update(added_files_queue[:space])
+            # XXX commit change here?
+            del added_files_queue[:space]
+    bot.log(f"{base_gallery}: {len(added_files_queue)} files still to add")
+    # Now sort the galleries by free space
+    def by_free_space(item):
+        return MAX_FILES_PER_GALLERY - len(item[1])
+    for n, these_files in sorted(gallery_files.items(),
+                                 key=by_free_space, reverse=True):
+        space = MAX_FILES_PER_GALLERY - len(these_files)
+        if space < len(added_files_queue) % MAX_FILES_PER_GALLERY: break
+        bot.log(f"{base_gallery}/{n} has room for {space} more files")
+        these_files.update(added_files_queue[:space])
+        # XXX commit change here?
+        del added_files_queue[:space]
+    # Remaining space in existing galleries is too small to use
+    # efficiently, so make new galleries.
+    bot.log(f"{base_gallery}: {len(added_files_queue)} files still to add")
+
     # gallery_number = 1
     # for i, chunk in enumerate(sliced(sorted(files.items()), 1000),
     #                           start = gallery_number):
