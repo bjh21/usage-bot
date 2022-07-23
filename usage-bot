@@ -55,7 +55,7 @@ def update_galleries(files, base_gallery):
             space = MAX_FILES_PER_GALLERY - len(these_files)
             bot.log(f"{base_gallery}/{n} has room for {space} more files")
             these_files.update(added_files_queue[:space])
-            # XXX commit change here?
+            update_gallery(f"{base_gallery}/{n}", these_files, files)
             del added_files_queue[:space]
     bot.log(f"{base_gallery}: {len(added_files_queue)} files still to add")
     # Now sort the galleries by free space
@@ -67,24 +67,31 @@ def update_galleries(files, base_gallery):
         if space < len(added_files_queue) % MAX_FILES_PER_GALLERY: break
         bot.log(f"{base_gallery}/{n} has room for {space} more files")
         these_files.update(added_files_queue[:space])
-        # XXX commit change here?
+        update_gallery(f"{base_gallery}/{n}", these_files, files)
         del added_files_queue[:space]
     # Remaining space in existing galleries is too small to use
     # efficiently, so make new galleries.
     bot.log(f"{base_gallery}: {len(added_files_queue)} files still to add")
 
-    # gallery_number = 1
-    # for i, chunk in enumerate(sliced(sorted(files.items()), 1000),
-    #                           start = gallery_number):
-    #     gallery = pywikibot.Page(site, f"{base_gallery}/{i}")
-    #     gallery.text = ("{{../header}}\n<gallery>\n" +
-    #                     "".join([f"{filename}|{caption}\n"
-    #                              for filename, caption in chunk]) +
-    #                     "</gallery>\n")
-    #     if i == 1:
-    #         with open(base_gallery, 'w') as f:
-    #             print(gallery.text, end='', file=f)
-    #     gallery.save("Files currently in use by OSM")
+    for n, chunk in enumerate(sliced(sorted(files.keys()),
+                                     MAX_FILES_PER_GALLERY),
+                              start = max(gallery_files.keys())):
+        bot.log(f"creating {base_gallery}/{n} with {len(chunk)} files")
+        update_gallery(f"{base_gallery}/{n}", chunk, files)
+
+def update_gallery(name, files, captions):
+    site = pywikibot.Site()
+    """name is the name of the gallery
+       files is a collection of files it should have
+       captions is the full dictionary of captions"""
+    gallery = pywikibot.Page(site, name)
+    gallery.text = ("{{../header}}\n<gallery>\n" +
+                    "".join([f"{filename}|{captions[filename]}\n"
+                             for filename in sorted(files)]) +
+                    "</gallery>\n")
+    with open(name, 'w') as f:
+        print(gallery.text, end='', file=f)
+    gallery.save("Updated with current data")
 
 def main(*args):
     # Process global arguments to determine desired site
