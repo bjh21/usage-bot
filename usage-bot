@@ -13,9 +13,9 @@ from usage_bot.osm import from_taginfo, from_overpass
 MAX_FILES_PER_GALLERY = 1000
 
 def usage_bot():
-    update_galleries(from_taginfo(), "User:Usage Bot/Used on OSM")
+    # update_galleries(from_taginfo(), "User:Usage Bot/Used on OSM")
     update_galleries(from_instantcommons(pywikibot.Site("wikitech:en")),
-                     "User:Usage Bot/Used on wikitech")
+                     "Commons:Files used on Wikitech")
 
 def get_existing_galleries(base_gallery):
     gen = pg.PrefixingPageGenerator(f"{base_gallery}/", content=True)
