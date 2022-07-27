@@ -89,8 +89,6 @@ def update_gallery(name, files, captions):
                     "".join([f"{filename}|{captions[filename]}\n"
                              for filename in sorted(files)]) +
                     "</gallery>\n")
-    with open(name, 'w') as f:
-        print(gallery.text, end='', file=f)
     gallery.save("Updated with current data")
 
 def main(*args):
