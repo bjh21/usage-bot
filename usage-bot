@@ -55,7 +55,9 @@ def update_galleries(files, base_gallery):
             space = MAX_FILES_PER_GALLERY - len(these_files)
             bot.log(f"{base_gallery}/{n} has room for {space} more files")
             these_files.update(added_files_queue[:space])
-            update_gallery(f"{base_gallery}/{n}", these_files, files)
+            update_gallery(f"{base_gallery}/{n}", these_files, files,
+                           f"Removed some files and added "
+                           f"{len(added_files_queue[:space])}")
             del added_files_queue[:space]
     bot.log(f"{base_gallery}: {len(added_files_queue)} files still to add")
     # Now sort the galleries by free space
@@ -67,7 +69,8 @@ def update_galleries(files, base_gallery):
         if space < len(added_files_queue) % MAX_FILES_PER_GALLERY: break
         bot.log(f"{base_gallery}/{n} has room for {space} more files")
         these_files.update(added_files_queue[:space])
-        update_gallery(f"{base_gallery}/{n}", these_files, files)
+        update_gallery(f"{base_gallery}/{n}", these_files, files,
+                       f"Added {len(added_files_queue[:space])} files")
         del added_files_queue[:space]
     # Remaining space in existing galleries is too small to use
     # efficiently, so make new galleries.
@@ -77,9 +80,10 @@ def update_galleries(files, base_gallery):
                                      MAX_FILES_PER_GALLERY),
                               start = max(gallery_files.keys()) + 1):
         bot.log(f"creating {base_gallery}/{n} with {len(chunk)} files")
-        update_gallery(f"{base_gallery}/{n}", chunk, files)
+        update_gallery(f"{base_gallery}/{n}", chunk, files,
+                       f"Created new gallery with {len(chunk)} files")
 
-def update_gallery(name, files, captions):
+def update_gallery(name, files, captions, summary):
     site = pywikibot.Site()
     """name is the name of the gallery
        files is a collection of files it should have
@@ -89,7 +93,7 @@ def update_gallery(name, files, captions):
                     "".join([f"{filename}|{captions[filename]}\n"
                              for filename in sorted(files)]) +
                     "</gallery>\n")
-    gallery.save("Updated with current data")
+    gallery.save(summary)
 
 def main(*args):
     # Process global arguments to determine desired site
