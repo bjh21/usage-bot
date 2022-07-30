@@ -1,0 +1,12 @@
+#! /bin/bash
+
+set -euo pipefail
+
+srcdir="${PWD}"
+workdir="$(mktemp -t -d "usage-bot-XXXXXX")"
+
+./mkvenv "${workdir}/venv"
+
+py="${workdir}/venv/bin/python3"
+
+"${py}" usage-bot -v -log
