@@ -73,7 +73,7 @@ def update_galleries(files, base_gallery):
 
     for n, chunk in enumerate(sliced(sorted(added_files_queue),
                                      MAX_FILES_PER_GALLERY),
-                              start = max(gallery_files.keys()) + 1):
+                              start = max(gallery_files.keys(), default=0) + 1):
         bot.log(f"creating {base_gallery}/{n} with {len(chunk)} files")
         update_gallery(f"{base_gallery}/{n}", chunk, files,
                        f"Created new gallery with {len(chunk)} files")
