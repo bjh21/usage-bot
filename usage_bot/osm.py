@@ -13,7 +13,7 @@ def from_taginfo():
             params = urlencode(dict(key="wikimedia_commons", value=v["value"]))
             tiurl = "https://taginfo.openstreetmap.org/tags/?" + params
             files[v['value']] = (
-                f"{v['value']}<br/>[{tiurl} {v['count']} use(s)]")
+                f"{v['value']}<br/>[{tiurl} ~{v['count']} use(s)]")
     return files
 
 oplq = """
