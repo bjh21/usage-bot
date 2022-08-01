@@ -32,6 +32,8 @@ def get_existing_galleries(base_gallery):
     return gallery_files
 
 def update_galleries(files, base_gallery):
+    extra_summary = files.editsummary if hasattr(files, 'editsummary') else ""
+    bot.log(f"Extra edit summary: {extra_summary!r}")
     site = pywikibot.Site()
     bot.log(f"{base_gallery}: {len(files)} files in use")
     gallery_files = get_existing_galleries(base_gallery)
@@ -53,7 +55,7 @@ def update_galleries(files, base_gallery):
             these_files.update(added_files_queue[:space])
             update_gallery(f"{base_gallery}/{n}", these_files, files,
                            f"Removed some files and added "
-                           f"{len(added_files_queue[:space])}")
+                           f"{len(added_files_queue[:space])}{extra_summary}")
             del added_files_queue[:space]
     bot.log(f"{base_gallery}: {len(added_files_queue)} files still to add")
     # Now sort the galleries by free space
@@ -66,7 +68,8 @@ def update_galleries(files, base_gallery):
         bot.log(f"{base_gallery}/{n} has room for {space} more files")
         these_files.update(added_files_queue[:space])
         update_gallery(f"{base_gallery}/{n}", these_files, files,
-                       f"Added {len(added_files_queue[:space])} files")
+                       f"Added {len(added_files_queue[:space])} files"
+                       f"{extra_summary}")
         del added_files_queue[:space]
     # Remaining space in existing galleries is too small to use
     # efficiently, so make new galleries.
@@ -75,7 +78,8 @@ def update_galleries(files, base_gallery):
     for n, chunk in enumerate(sliced(sorted(added_files_queue),
                                      MAX_FILES_PER_GALLERY),
                               start = max(gallery_files.keys(), default=0) + 1):
-        bot.log(f"creating {base_gallery}/{n} with {len(chunk)} files")
+        bot.log(f"creating {base_gallery}/{n} with {len(chunk)} files"
+                f"{extra_summary}")
         update_gallery(f"{base_gallery}/{n}", chunk, files,
                        f"Created new gallery with {len(chunk)} files")
 

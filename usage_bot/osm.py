@@ -2,19 +2,31 @@ import pywikibot.comms.http as http
 import re
 from urllib.parse import urlencode
 
-def from_taginfo():
-    r = http.fetch("https://taginfo.openstreetmap.org/api/4/key/values"
-                    "?key=wikimedia_commons")
+class from_taginfo(dict):
+    def __init__(files):
+        files.editsummary = taginfo_editsummary()
+        r = http.fetch("https://taginfo.openstreetmap.org/api/4/key/values"
+                       "?key=wikimedia_commons")
+        r.raise_for_status()
+        j = r.json()
+        for v in j["data"]:
+            if re.match("^File:", v["value"], re.IGNORECASE):
+                params = urlencode(dict(key="wikimedia_commons",
+                                        value=v["value"]))
+                tiurl = "https://taginfo.openstreetmap.org/tags/?" + params
+                files[v['value']] = (
+                    f"{v['value']}<br/>[{tiurl} ~{v['count']} use(s)]")
+
+def taginfo_editsummary():
+    r = http.fetch("https://taginfo.openstreetmap.org/api/4/site/info")
     r.raise_for_status()
-    j = r.json()
-    files = {}
-    for v in j["data"]:
-        if re.match("^File:", v["value"], re.IGNORECASE):
-            params = urlencode(dict(key="wikimedia_commons", value=v["value"]))
-            tiurl = "https://taginfo.openstreetmap.org/tags/?" + params
-            files[v['value']] = (
-                f"{v['value']}<br/>[{tiurl} ~{v['count']} use(s)]")
-    return files
+    site_info = r.json()
+    r = http.fetch("https://taginfo.openstreetmap.org/api/4/site/sources")
+    r.raise_for_status()
+    site_sources = r.json()
+    dbsrc = [src for src in site_sources if src['id'] == 'db'][0]
+    return (f"; data via {site_info['name']} [{site_info['url']}]; "
+            f"correct as of {dbsrc['data_until']} UTC")
 
 oplq = """
 [out:json];
