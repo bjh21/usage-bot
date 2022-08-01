@@ -3,6 +3,7 @@
 from more_itertools import sliced
 import pywikibot
 import pywikibot.bot as bot
+from pywikibot.exceptions import AbuseFilterDisallowedError
 import pywikibot.pagegenerators as pg
 import mwparserfromhell
 import re
@@ -88,7 +89,12 @@ def update_gallery(name, files, captions, summary):
                     "".join([f"{filename}|{captions[filename]}\n"
                              for filename in sorted(files)]) +
                     "</gallery>\n")
-    gallery.save(summary)
+    try:
+        gallery.save(summary, minor=False)
+    except AbuseFilterDisallowedError:
+        # Seen this trip a (private) abuse filter on
+        # Commons:Files used on OpenStreetMap/6
+        bot.warning("Save failed.  Continuing...")
 
 def main(*args):
     # Process global arguments to determine desired site
