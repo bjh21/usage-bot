@@ -41,6 +41,8 @@ def update_galleries(files, base_gallery):
             f"{sum(map(len, gallery_files.values()))} "
             "files in galleries already")
     files_set = set(files.keys())
+    # Filter out alleged filenames with impossible characters
+    files_set = { f for f in files_set if '|' not in f }
     # Find the files we want that aren't in any gallery.
     added_files_queue = sorted(files_set.difference(*gallery_files.values()))
     bot.log(f"{base_gallery}: {len(added_files_queue)} new files")
