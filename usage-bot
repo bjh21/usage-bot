@@ -65,6 +65,9 @@ def update_galleries(files, base_gallery):
         return MAX_FILES_PER_GALLERY - len(item[1])
     for n, these_files in sorted(gallery_files.items(),
                                  key=by_free_space, reverse=True):
+        if len(added_files_queue) == 0:
+            bot.log(f"{base_gallery}: No files left to add")
+            return
         space = MAX_FILES_PER_GALLERY - len(these_files)
         if space < len(added_files_queue) % MAX_FILES_PER_GALLERY: break
         bot.log(f"{base_gallery}/{n} has room for {space} more files")
