@@ -3,16 +3,17 @@ import re
 from urllib.parse import urlencode
 
 class from_taginfo(dict):
-    def __init__(files):
-        files.editsummary = taginfo_editsummary()
-        r = http.fetch("https://taginfo.openstreetmap.org/api/4/key/values"
-                       "?key=wikimedia_commons")
+    def __init__(self):
+        self.editsummary = taginfo_editsummary()
+        self.from_key("wikimedia_commons")
+    def from_key(files, key):
+        r = http.fetch("https://taginfo.openstreetmap.org/api/4/key/values",
+                       params={'key': key})
         r.raise_for_status()
         j = r.json()
         for v in j["data"]:
             if re.match("^File:", v["value"], re.IGNORECASE):
-                params = urlencode(dict(key="wikimedia_commons",
-                                        value=v["value"]))
+                params = urlencode(dict(key=key, value=v["value"]))
                 tiurl = "https://taginfo.openstreetmap.org/tags/?" + params
                 files[v['value']] = (
                     f"{v['value']}<br/>[{tiurl} ~{v['count']} use(s)]")
