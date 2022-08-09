@@ -6,19 +6,21 @@ class from_taginfo(dict):
     def __init__(self):
         self.editsummary = taginfo_editsummary()
         self.from_key("wikimedia_commons")
-        # self.from_key("image")
-    def from_key(files, key):
+        # self.from_key("image", allowurls=True)
+    def from_key(files, key, allowurls=False):
         r = http.fetch("https://taginfo.openstreetmap.org/api/4/key/values",
                        params={'key': key})
         r.raise_for_status()
         j = r.json()
         for v in j["data"]:
             title = v["value"]
-            # image=* might be either a Commons page title or a URL
-            m = re.match("^https?://commons.wikimedia.org/wiki/(File:[^#?]*)",
-                         title, re.IGNORECASE)
-            if m:
-                title = m[1]
+            if allowurls:
+                # image=* might be either a Commons page title or a URL
+                m = re.match("^https?://commons.wikimedia.org/wiki/"
+                             "(File:[^#?]*)",
+                             title, re.IGNORECASE)
+                if m:
+                    title = m[1]
             if re.match("^File:", title, re.IGNORECASE):
                 params = urlencode(dict(key=key, value=v['value']))
                 tiurl = "https://taginfo.openstreetmap.org/tags/?" + params
