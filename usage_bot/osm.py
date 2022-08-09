@@ -15,7 +15,7 @@ class from_taginfo(dict):
         for v in j["data"]:
             title = v["value"]
             # image=* might be either a Commons page title or a URL
-            m = re.match("^https?://commons.wikimedia.org/wiki/(File:.*)$",
+            m = re.match("^https?://commons.wikimedia.org/wiki/(File:[^#?]*)",
                          title, re.IGNORECASE)
             if m:
                 title = m[1]
