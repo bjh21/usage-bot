@@ -1,14 +1,15 @@
 import pywikibot.comms.http as http
 import re
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urljoin
 
 class from_taginfo(dict):
-    def __init__(self):
+    def __init__(self, baseurl="https://taginfo.openstreetmap.org"):
         self.editsummary = taginfo_editsummary()
         self.from_key("wikimedia_commons")
+        self.baseurl = baseurl
         # self.from_key("image", allowurls=True)
     def from_key(files, key, allowurls=False):
-        r = http.fetch("https://taginfo.openstreetmap.org/api/4/key/values",
+        r = http.fetch(urljoin(self.baseurl, "api/4/key/values"),
                        params={'key': key})
         r.raise_for_status()
         j = r.json()
@@ -23,7 +24,7 @@ class from_taginfo(dict):
                     title = m[1]
             if re.match("^File:", title, re.IGNORECASE):
                 params = urlencode(dict(key=key, value=v['value']))
-                tiurl = "https://taginfo.openstreetmap.org/tags/?" + params
+                tiurl = urljoin(self.baseurl, "tags/?") + params
                 if title in files:
                     files[title] += "<br/>"
                 else:
