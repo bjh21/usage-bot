@@ -4,9 +4,9 @@ from urllib.parse import urlencode, urljoin
 
 class from_taginfo(dict):
     def __init__(self, baseurl="https://taginfo.openstreetmap.org"):
-        self.editsummary = taginfo_editsummary()
-        self.from_key("wikimedia_commons")
         self.baseurl = baseurl
+        self.editsummary = self.get_editsummary()
+        self.from_key("wikimedia_commons")
         # self.from_key("image", allowurls=True)
     def from_key(files, key, allowurls=False):
         r = http.fetch(urljoin(self.baseurl, "api/4/key/values"),
@@ -30,17 +30,17 @@ class from_taginfo(dict):
                 else:
                     files[title] = ""
                 files[title] += (f"[{tiurl} {key}={v['value']}]")
+    def get_editsummary(self):
+        r = http.fetch(urljoin(self.baseurl, "api/4/site/info"))
+        r.raise_for_status()
+        site_info = r.json()
+        r = http.fetch(urljoin(self.baseurl, "api/4/site/sources"))
+        r.raise_for_status()
+        site_sources = r.json()
+        dbsrc = [src for src in site_sources if src['id'] == 'db'][0]
+        return (f"; data via {site_info['name']} [{site_info['url']}]; "
+                f"correct as of {dbsrc['data_until']} UTC")
 
-def taginfo_editsummary():
-    r = http.fetch("https://taginfo.openstreetmap.org/api/4/site/info")
-    r.raise_for_status()
-    site_info = r.json()
-    r = http.fetch("https://taginfo.openstreetmap.org/api/4/site/sources")
-    r.raise_for_status()
-    site_sources = r.json()
-    dbsrc = [src for src in site_sources if src['id'] == 'db'][0]
-    return (f"; data via {site_info['name']} [{site_info['url']}]; "
-            f"correct as of {dbsrc['data_until']} UTC")
 
 oplq = """
 [out:json];
