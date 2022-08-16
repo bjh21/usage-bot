@@ -115,6 +115,7 @@ def main(*args):
         update_galleries(from_instantcommons(pywikibot.Site("osm:en")),
                          "Commons:Files used on OpenStreetMap Wiki")
     if '-wikitech' in local_args:
-        update_galleries(from_instantcommons(pywikibot.Site("wikitech:en")),
+        update_galleries(from_instantcommons(pywikibot.Site("wikitech:en"),
+                                             iwprefix="wikitech"),
                          "Commons:Files used on Wikitech")
 main()
