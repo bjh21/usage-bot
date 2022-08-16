@@ -1,0 +1,15 @@
+# https://wikitech.wikimedia.org/wiki/Help:Toolforge/Jobs_framework
+---
+
+# Update from OSM daily.  Taginfo sets all its HTTP responses to
+# expire at 05:59:59 UTC, so we run shortly after that.
+- name: usage-bot-osm
+  command: "cd usage-bot && ./cron.osm"
+  image: tf-python39
+  schedule: "02 07 * * *" # 07:02 every day
+
+# Weekly update from slow-changing sources
+- name: usage-bot-weekly
+  command: "cd usage-bot && ./cron.weekly"
+  image: tf-python39
+  schedule: "33 06 * * 1" # 06:33 every Monday
