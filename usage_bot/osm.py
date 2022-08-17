@@ -8,7 +8,7 @@ class from_taginfo(dict):
         self.editsummary = self.get_editsummary()
         self.from_key("wikimedia_commons")
         # self.from_key("image", allowurls=True)
-    def from_key(files, key, allowurls=False):
+    def from_key(self, key, allowurls=False):
         r = http.fetch(urljoin(self.baseurl, "api/4/key/values"),
                        params={'key': key})
         r.raise_for_status()
@@ -25,11 +25,11 @@ class from_taginfo(dict):
             if re.match("^File:", title, re.IGNORECASE):
                 params = urlencode(dict(key=key, value=v['value']))
                 tiurl = urljoin(self.baseurl, "tags/?") + params
-                if title in files:
-                    files[title] += "<br/>"
+                if title in self:
+                    self[title] += "<br/>"
                 else:
-                    files[title] = ""
-                files[title] += (f"[{tiurl} {key}={v['value']}]")
+                    self[title] = ""
+                self[title] += (f"[{tiurl} {key}={v['value']}]")
     def get_editsummary(self):
         r = http.fetch(urljoin(self.baseurl, "api/4/site/info"))
         r.raise_for_status()
