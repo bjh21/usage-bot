@@ -24,7 +24,7 @@ class from_taginfo(dict):
                     title = m[1]
             if re.match("^File:", title, re.IGNORECASE):
                 params = urlencode(dict(key=key, value=v['value']))
-                tiurl = urljoin(self.baseurl, "tags/?") + params
+                tiurl = urljoin(self.baseurl, "tags/?" + params)
                 if title in self:
                     self[title] += "<br/>"
                 else:
