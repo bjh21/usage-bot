@@ -1,0 +1,27 @@
+#! /usr/bin/python3
+
+import pywikibot
+import random
+import sys
+
+from usage_bot.instantcommons import from_instantcommons
+from usage_bot.osm import from_taginfo, from_overpass
+
+def show_demo(files):
+    random.seed(0)
+    print("<gallery>")
+    for f in sorted(random.sample(sorted(files.keys()), 1000)):
+        print(f"{f}|{files[f]}")
+    print("</gallery>")
+
+def main():
+    if '-osm' in sys.argv:
+        show_demo(from_taginfo())
+    if '-osmwiki' in sys.argv:
+        show_demo(from_instantcommons(pywikibot.Site("osm:en"),
+                                      iwprefix="osmwiki"))
+    if '-wikitech' in sys.argv:
+        show_demo(from_instantcommons(pywikibot.Site("wikitech:en"),
+                                      iwprefix="wikitech"))
+
+main()
