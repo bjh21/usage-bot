@@ -1,1 +1,5 @@
 __pycache__
+/apicache-py3
+/logs
+/throttle.ctrl
+/user-config.py
