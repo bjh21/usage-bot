@@ -27,7 +27,7 @@ class from_instantcommons(dict):
                 # <gallery> works perfectly well without it and that
                 # saves 5 KB per gallery.  At least, until someone
                 # uploads a file to Commons whose name begins "File:",
-                # but a search suggests that this has only every
+                # but a search suggests that this has only ever
                 # happened once.
                 if iwprefix == None:
                     self[commons_title] = f"[{f['fullurl']} {f['title']}]"
