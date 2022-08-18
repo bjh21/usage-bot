@@ -9,6 +9,7 @@ from usage_bot.osm import from_taginfo, from_overpass
 
 def show_demo(files):
     random.seed(0)
+    print(f"This is a sample of 1000 files from a total of {len(files)}.")
     print("<gallery>")
     for f in sorted(random.sample(sorted(files.keys()), 1000)):
         print(f"{f}|{files[f]}")
