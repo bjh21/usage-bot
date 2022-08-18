@@ -15,7 +15,7 @@ MAX_FILES_PER_GALLERY = 1000
 
 def get_existing_galleries(base_gallery):
     gen = pg.PrefixingPageGenerator(f"{base_gallery}/", content=True)
-    gen = pg.RegexFilterPageGenerator(gen, fr"^{re.escape(base_gallery)}/\d+",
+    gen = pg.RegexFilterPageGenerator(gen, fr"^{re.escape(base_gallery)}/\d+$",
                                       ignore_namespace=False)
     gallery_files = { }
     for p in gen:
