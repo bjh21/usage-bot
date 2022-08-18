@@ -1,5 +1,6 @@
 __pycache__
 /apicache-py3
 /logs
+/pywikibot.lwp
 /throttle.ctrl
 /user-config.py
