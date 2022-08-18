@@ -49,14 +49,15 @@ def update_galleries(files, base_gallery):
     # First pass: find galleries that must be edited to remove files,
     # remove those files, and fill the galleries up.
     for n, these_files in sorted(gallery_files.items()):
-        if these_files - files_set:
-            bot.log(f"{base_gallery}/{n} needs files removed")
+        nremoved = len(these_files - files_set)
+        if nremoved > 0:
+            bot.log(f"{base_gallery}/{n} needs {nremoved} files removed")
             these_files.intersection_update(files_set)
             space = MAX_FILES_PER_GALLERY - len(these_files)
             bot.log(f"{base_gallery}/{n} has room for {space} more files")
             these_files.update(added_files_queue[:space])
             update_gallery(f"{base_gallery}/{n}", these_files, files,
-                           f"Removed some files and added "
+                           f"Removed {nremoved} files and added "
                            f"{len(added_files_queue[:space])}{extra_summary}")
             del added_files_queue[:space]
     bot.log(f"{base_gallery}: {len(added_files_queue)} files still to add")
