@@ -1,13 +1,13 @@
 import pywikibot.comms.http as http
 import re
-from urllib.parse import urlencode, urljoin
+from urllib.parse import urlencode, urljoin, unquote
 
 class from_taginfo(dict):
     def __init__(self, baseurl="https://taginfo.openstreetmap.org"):
         self.baseurl = baseurl
         self.editsummary = self.get_editsummary()
         self.from_key("wikimedia_commons")
-        self.from_key("image")
+        self.from_key("image", allowurls=True)
     def from_key(self, key, allowurls=False):
         r = http.fetch(urljoin(self.baseurl, "api/4/key/values"),
                        params={'key': key})
@@ -21,7 +21,7 @@ class from_taginfo(dict):
                              "(File:[^#?]*)",
                              title, re.IGNORECASE)
                 if m:
-                    title = m[1]
+                    title = unquote(m[1]).replace("_", " ")
             if re.match("^File:", title, re.IGNORECASE):
                 params = urlencode(dict(key=key, value=v['value']))
                 tiurl = urljoin(self.baseurl, "tags/?" + params)
