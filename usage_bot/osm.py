@@ -7,7 +7,7 @@ class from_taginfo(dict):
         self.baseurl = baseurl
         self.editsummary = self.get_editsummary()
         self.from_key("wikimedia_commons")
-        # self.from_key("image", allowurls=True)
+        self.from_key("image")
     def from_key(self, key, allowurls=False):
         r = http.fetch(urljoin(self.baseurl, "api/4/key/values"),
                        params={'key': key})
