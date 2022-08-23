@@ -8,8 +8,7 @@ import pywikibot.pagegenerators as pg
 import mwparserfromhell
 import re
 
-from usage_bot.instantcommons import from_instantcommons
-from usage_bot.osm import from_taginfo, from_overpass
+from usage_bot import from_args
 
 MAX_FILES_PER_GALLERY = 1000
 
@@ -41,8 +40,6 @@ def update_galleries(files, base_gallery):
             f"{sum(map(len, gallery_files.values()))} "
             "files in galleries already")
     files_set = set(files.keys())
-    # Filter out alleged filenames with impossible characters
-    files_set = { f for f in files_set if '|' not in f }
     # Find the files we want that aren't in any gallery.
     added_files_queue = sorted(files_set.difference(*gallery_files.values()))
     bot.log(f"{base_gallery}: {len(added_files_queue)} new files")
@@ -84,10 +81,10 @@ def update_galleries(files, base_gallery):
     for n, chunk in enumerate(sliced(sorted(added_files_queue),
                                      MAX_FILES_PER_GALLERY),
                               start = max(gallery_files.keys(), default=0) + 1):
-        bot.log(f"creating {base_gallery}/{n} with {len(chunk)} files"
-                f"{extra_summary}")
+        bot.log(f"creating {base_gallery}/{n} with {len(chunk)} files")
         update_gallery(f"{base_gallery}/{n}", chunk, files,
-                       f"Created new gallery with {len(chunk)} files")
+                       f"Created new gallery with {len(chunk)} files"
+                       f"{extra_summary}")
 
 def update_gallery(name, files, captions, summary):
     site = pywikibot.Site()
@@ -110,14 +107,12 @@ def main(*args):
     # Process global arguments to determine desired site
     local_args = pywikibot.handle_args(args)
 
+    files = from_args(local_args)
     if '-osm' in local_args:
-        update_galleries(from_taginfo(), "Commons:Files used on OpenStreetMap")
-    if '-osmwiki' in local_args:
-        update_galleries(from_instantcommons(pywikibot.Site("osm:en"),
-                                             iwprefix="osmwiki"),
-                         "Commons:Files used on the OpenStreetMap Wiki")
-    if '-wikitech' in local_args:
-        update_galleries(from_instantcommons(pywikibot.Site("wikitech:en"),
-                                             iwprefix="wikitech"),
-                         "Commons:Files used on Wikitech")
+        update_galleries(files, "Commons:Files used on OpenStreetMap")
+    elif '-osmwiki' in local_args:
+        update_galleries(files, "Commons:Files used on the OpenStreetMap Wiki")
+    elif '-wikitech' in local_args:
+        update_galleries(files, "Commons:Files used on Wikitech")
+
 main()
