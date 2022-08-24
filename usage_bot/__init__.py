@@ -18,5 +18,29 @@ def from_args(args):
     elif '-wikitech' in args:
         files = from_instantcommons(pywikibot.Site("wikitech:en"),
                                     iwprefix="wikitech")
+    elif '-wmat' in args:
+        files = from_instantcommons(pywikibot.Site("wmat:de"),
+                                    iwprefix="wmat")
+    elif '-wmau' in args:
+        files = from_instantcommons(pywikibot.Site("wmau:en"),
+                                    iwprefix="wmau")
+    elif '-wmczold' in args:
+        files = from_instantcommons(pywikibot.Site("wmczold:cs"),
+                                    iwprefix="wmcz_old")
+    elif '-wmczdocs' in args:
+        files = from_instantcommons(pywikibot.Site("wmczdocs:cs"),
+                                    iwprefix="wmcz_docs")
+    elif '-wmau' in args:
+        files = from_instantcommons(pywikibot.Site("wmau:en"),
+                                    iwprefix="wmau")
+    elif '-wmdc' in args:
+        files = from_instantcommons(pywikibot.Site("wmdc:en"),
+                                    iwprefix="wmdc")
+    elif '-wmhu' in args:
+        files = from_instantcommons(pywikibot.Site("wmhu:hu"),
+                                    iwprefix="wmhu")
+    elif '-wmuk' in args:
+        files = from_instantcommons(pywikibot.Site("wmuk:en"),
+                                    iwprefix="wmuk")
     filter_files(files)
     return files
