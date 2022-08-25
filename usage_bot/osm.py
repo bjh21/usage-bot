@@ -1,6 +1,7 @@
 import pywikibot.comms.http as http
 import re
 from urllib.parse import urlencode, urljoin, unquote
+from .util import canonicalise_name
 
 class from_taginfo(dict):
     def __init__(self, baseurl="https://taginfo.openstreetmap.org"):
@@ -21,10 +22,11 @@ class from_taginfo(dict):
                              "(File:[^#?]*)",
                              title, re.IGNORECASE)
                 if m:
-                    title = unquote(m[1]).replace("_", " ")
+                    title = m[1]
             if re.match("^File:", title, re.IGNORECASE):
                 params = urlencode(dict(key=key, value=v['value']))
                 tiurl = urljoin(self.baseurl, "tags/?" + params)
+                title = canonicalise_name(title)
                 if title in self:
                     self[title] += "<br/>"
                 else:

@@ -8,7 +8,7 @@ import pywikibot.pagegenerators as pg
 import mwparserfromhell
 import re
 
-from usage_bot import from_args
+from usage_bot import from_args, canonicalise_name
 
 MAX_FILES_PER_GALLERY = 1000
 
@@ -25,7 +25,7 @@ def get_existing_galleries(base_gallery):
             # I don't think mwparserfromhell understands the contents
             # of <gallery>, so we have to parse it ourselves.
             for line in gall.contents.splitlines():
-                files.add(line.split('|', 1)[0].strip())
+                files.add(canonicalise_name(line.split('|', 1)[0].strip()))
         files.discard('') # Blank lines in galleries are ignored
         gallery_files[int(p.title().split('/')[-1])] = files
     return gallery_files
