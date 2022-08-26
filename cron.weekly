@@ -10,3 +10,4 @@ workdir="$(mktemp -t -d "usage-bot-XXXXXX")"
 py="${workdir}/venv/bin/python3"
 
 "${py}" usage-bot -wikitech -v -log
+"${py}" usage-bot -osmwiki -v -log
