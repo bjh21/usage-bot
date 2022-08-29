@@ -12,4 +12,4 @@
 - name: usage-bot-weekly
   command: "cd usage-bot && ./cron.weekly"
   image: tf-python39
-  schedule: "33 06 * * 1" # 06:33 every Monday
+  schedule: "33 03 * * 1" # 03:33 every Monday
