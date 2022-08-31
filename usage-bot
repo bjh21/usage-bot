@@ -111,13 +111,21 @@ def update_galleries(files, base_gallery):
                      edit_summary(0, 0, 0, len(chunk)))
 
 def save_gallery(name, files, captions, summary):
+    def for_gallery(filename):
+        # Disambiguate filenames that start with "File:", i.e. where
+        # the page title starts "File:File:".  No such files exist on
+        # Commons, but we want to ensure that attempts at using them
+        # don't accidentally mark unused files as used.
+        if re.match(r'^File:', filename, re.IGNORECASE):
+            return "File:" + filename
+        return filename
     site = pywikibot.Site()
     """name is the name of the gallery
        files is a collection of files it should have
        captions is the full dictionary of captions"""
     gallery = pywikibot.Page(site, name)
     gallery.text = ("{{../header}}\n<gallery>\n" +
-                    "".join([f"{filename}|{captions[filename]}\n"
+                    "".join([f"{for_gallery(filename)}|{captions[filename]}\n"
                              for filename in sorted(files)]) +
                     "</gallery>\n")
     try:
