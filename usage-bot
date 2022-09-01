@@ -42,7 +42,6 @@ def update_galleries(files, base_gallery):
     files_set = set(files.keys())
     # Find the files we want that aren't in any gallery.
     added_files_queue = sorted(files_set.difference(*gallery_files.values()))
-    bot.log(f"{base_gallery}: {len(added_files_queue)}")
     def edit_summary(nstart, nunused, ndupe, nadded):
         s = ""
         if nunused == 1: s += ", removed 1 unused file"
