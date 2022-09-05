@@ -5,7 +5,7 @@
 	"description": "Bot to track external usage of files from Wikimedia Commons",
 	"project_url": "https://commons.wikimedia.org/wiki/User:Usage_Bot",
 	"contact_name": "Ben Harris",
-	"contact_email": "bjh21@bjh21.me.uk",
+	"contact_email": "bjh21@bjh21.me.uk"
     },
     "tags": [
 	{
