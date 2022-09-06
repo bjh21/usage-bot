@@ -38,7 +38,7 @@ class from_wikibase(dict):
                 if title in self:
                     self[title] += "<br/>"
                 else:
-                    self[title] = f"{title} used on<br/>"
+                    self[title] = f"{title}<br/>"
                 if iwprefix == None:
                     self[title] += f"[{f['fullurl']} {f['title']}]"
                 else:
