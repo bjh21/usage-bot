@@ -3,6 +3,7 @@ import pywikibot
 from usage_bot.instantcommons import from_instantcommons
 from usage_bot.osm import from_taginfo, from_overpass
 from usage_bot.util import canonicalise_name
+from usage_bot.wikibase import from_wikibase
 
 def filter_files(files):
     # Filter out alleged filenames with impossible characters
@@ -19,5 +20,8 @@ def from_args(args):
     elif '-wikitech' in args:
         files = from_instantcommons(pywikibot.Site("wikitech:en"),
                                     iwprefix="wikitech")
+    elif '-osmwikibase' in args:
+        # Empty iwprefix assumes page will go on OSM Wiki
+        files = from_wikibase(pywikibot.Site("osm:en"), iwprefix="")
     filter_files(files)
     return files
