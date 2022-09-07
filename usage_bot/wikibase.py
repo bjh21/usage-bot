@@ -35,12 +35,12 @@ class from_wikibase(dict):
                 if claim['mainsnak']['snaktype'] != 'value': continue
                 title = claim['mainsnak']['datavalue']['value']
                 title = canonicalise_name(title)
-                if title in self:
-                    self[title] += "<br/>"
+                self.setdefault(title, set())
+                if iwprefix != None:
+                    self[title].add(f"[[{iwprefix}:{f['title']}]]")
                 else:
-                    self[title] = f"{title}<br/>"
-                if iwprefix == None:
-                    self[title] += f"[{f['fullurl']} {f['title']}]"
-                else:
-                    self[title] += f"[[{iwprefix}:{f['title']}]]"
+                    self[title].add(f"[{f['fullurl']} {f['title']}]")
+        # Now rewrite the sets into strings
+        for k in self:
+            self[k] = f"{k}<br/>" + "<br/>".join(sorted(self[k]))
 
