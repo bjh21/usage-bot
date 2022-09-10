@@ -143,6 +143,8 @@ def main(*args):
         update_galleries(files, "Commons:Files used on OpenStreetMap")
     elif '-osmwiki' in local_args:
         update_galleries(files, "Commons:Files used on the OpenStreetMap Wiki")
+    elif '-osmwikibase' in local_args:
+        update_galleries(files, "Wiki:Files used by data items")
     elif '-wikitech' in local_args:
         update_galleries(files, "Commons:Files used on Wikitech")
 
