@@ -1,4 +1,5 @@
 import re
+from subprocess import run, CalledProcessError, PIPE
 from urllib.parse import unquote
 
 def canonicalise_name(name):
@@ -11,3 +12,11 @@ def canonicalise_name(name):
     # precisely how MediaWiki does that.
     return name
             
+def summary_revision():
+    # Return a suitable suffix for an edit summary indicating which
+    # code revision we're running.
+    try:
+        return " | " + run(['git', 'describe', '--always', '--dirty'],
+                          check=True, encoding='utf-8', stdout=PIPE).stdout
+    except CalledProcessError:
+        return ""

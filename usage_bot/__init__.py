@@ -2,7 +2,7 @@ import pywikibot
 
 from usage_bot.instantcommons import from_instantcommons
 from usage_bot.osm import from_taginfo, from_overpass
-from usage_bot.util import canonicalise_name
+from usage_bot.util import canonicalise_name, summary_revision
 from usage_bot.wikibase import from_wikibase
 
 def filter_files(files):

@@ -8,7 +8,7 @@ import pywikibot.pagegenerators as pg
 import mwparserfromhell
 import re
 
-from usage_bot import from_args, canonicalise_name
+from usage_bot import from_args, canonicalise_name, summary_revision
 
 MAX_FILES_PER_GALLERY = 1000
 
@@ -33,6 +33,7 @@ def get_existing_galleries(site, base_gallery):
 
 def update_galleries(files, site, base_gallery):
     extra_summary = files.editsummary if hasattr(files, 'editsummary') else ""
+    extra_summary += summary_revision()
     bot.log(f"Extra edit summary: {extra_summary!r}")
     bot.log(f"{base_gallery}: {len(files)} files in use")
     gallery_files = get_existing_galleries(site, base_gallery)
