@@ -12,8 +12,9 @@ from usage_bot import from_args, canonicalise_name
 
 MAX_FILES_PER_GALLERY = 1000
 
-def get_existing_galleries(base_gallery):
-    gen = pg.PrefixingPageGenerator(f"{base_gallery}/", content=True)
+def get_existing_galleries(site, base_gallery):
+    gen = pg.PrefixingPageGenerator(f"{base_gallery}/",
+                                    site=site, content=True)
     gen = pg.RegexFilterPageGenerator(
         gen, fr"^{re.escape(base_gallery)}/[1-9]\d*$", ignore_namespace=False)
     gallery_files = { }
@@ -30,12 +31,11 @@ def get_existing_galleries(base_gallery):
         gallery_files[int(p.title().split('/')[-1])] = files
     return gallery_files
 
-def update_galleries(files, base_gallery):
+def update_galleries(files, site, base_gallery):
     extra_summary = files.editsummary if hasattr(files, 'editsummary') else ""
     bot.log(f"Extra edit summary: {extra_summary!r}")
-    site = pywikibot.Site()
     bot.log(f"{base_gallery}: {len(files)} files in use")
-    gallery_files = get_existing_galleries(base_gallery)
+    gallery_files = get_existing_galleries(site, base_gallery)
     bot.log(f"{base_gallery}: "
             f"{sum(map(len, gallery_files.values()))} "
             "files in galleries already")
@@ -74,7 +74,7 @@ def update_galleries(files, base_gallery):
         del added_files_queue[:space]
         nadded = len(gallery_files[n]) - nstart + nunused + ndupe
         bot.log(f"Saving {base_gallery}/{n} with {len(gallery_files[n])} files")
-        save_gallery(f"{base_gallery}/{n}", gallery_files[n], files,
+        save_gallery(site, f"{base_gallery}/{n}", gallery_files[n], files,
                      edit_summary(nstart, nunused, ndupe, nadded))
     # First pass: find galleries that must be edited to remove files,
     # remove those files, and fill the galleries up.
@@ -106,10 +106,10 @@ def update_galleries(files, base_gallery):
                                      MAX_FILES_PER_GALLERY),
                               start = max(gallery_files.keys(), default=0) + 1):
         bot.log(f"creating {base_gallery}/{n} with {len(chunk)} files")
-        save_gallery(f"{base_gallery}/{n}", chunk, files,
+        save_gallery(site, f"{base_gallery}/{n}", chunk, files,
                      edit_summary(0, 0, 0, len(chunk)))
 
-def save_gallery(name, files, captions, summary):
+def save_gallery(site, name, files, captions, summary):
     def for_gallery(filename):
         # Disambiguate filenames that start with "File:", i.e. where
         # the page title starts "File:File:".  No such files exist on
@@ -118,7 +118,6 @@ def save_gallery(name, files, captions, summary):
         if re.match(r'^File:', filename, re.IGNORECASE):
             return "File:" + filename
         return filename
-    site = pywikibot.Site()
     """name is the name of the gallery
        files is a collection of files it should have
        captions is the full dictionary of captions"""
@@ -140,12 +139,16 @@ def main(*args):
 
     files = from_args(local_args)
     if '-osm' in local_args:
-        update_galleries(files, "Commons:Files used on OpenStreetMap")
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used on OpenStreetMap")
     elif '-osmwiki' in local_args:
-        update_galleries(files, "Commons:Files used on the OpenStreetMap Wiki")
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used on the OpenStreetMap Wiki")
     elif '-osmwikibase' in local_args:
-        update_galleries(files, "Wiki:Files used by data items")
+        update_galleries(files, pywikibot.Site("osm:en"),
+                         "Wiki:Files used by data items")
     elif '-wikitech' in local_args:
-        update_galleries(files, "Commons:Files used on Wikitech")
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used on Wikitech")
 
 main()

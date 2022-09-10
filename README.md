@@ -14,8 +14,6 @@ virtual environment called `venv` based on `requirements.txt`.
 You'll need a suitable `user-config.py`.  This will need to override a
 few settings from Pywikibot's `config.py`.  You'll probably want to set:
 
-* `family = 'commons'`
-* `mylang = 'commons'`
 * `usernames['commons']['commons']` to the bot's user name on Commons
 * `usernames['osm']['en']` to the bot's user name on the OSM Wiki
 * `authenticate['commons.wikimedia.org']` to the bot's OAuth tokens (see [Manual:Pywikibot/OAuth/Wikimedia](https://www.mediawiki.org/wiki/Manual:Pywikibot/OAuth/Wikimedia))

@@ -15,6 +15,6 @@ py="${workdir}/venv/bin/python3"
 # errors.
 set +e
 
-"${py}" usage-bot -site:osm:en -osmwikibase -v -log
+"${py}" usage-bot -osmwikibase -v -log
 "${py}" usage-bot -wikitech -v -log
 "${py}" usage-bot -osmwiki -v -log
