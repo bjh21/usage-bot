@@ -19,7 +19,7 @@ few settings from Pywikibot's `config.py`.  You'll probably want to set:
 * `usernames['commons']['commons']` to the bot's user name on Commons
 * `usernames['osm']['en']` to the bot's user name on the OSM Wiki
 * `authenticate['commons.wikimedia.org']` to the bot's OAuth tokens (see [Manual:Pywikibot/OAuth/Wikimedia](https://www.mediawiki.org/wiki/Manual:Pywikibot/OAuth/Wikimedia))
-* `password_file` to the name of a file containing a [https://www.mediawiki.org/wiki/Manual:Pywikibot/BotPasswords](bot password) for the OSM Wiki
+* `password_file` to the name of a file containing a [bot password](https://www.mediawiki.org/wiki/Manual:Pywikibot/BotPasswords) for the OSM Wiki
 * `user_agent_description` to something identifying who is running the bot.
 
 The settings relating to Commons or the OSM Wiki are only required for
