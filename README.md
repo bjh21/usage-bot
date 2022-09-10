@@ -26,7 +26,7 @@ The settings relating to Commons or the OSM Wiki are only required for
 those wikis that the bot will be updating.
 
 Any OAuth consumer or bot password that you create for the bot should
-these grants:
+have these grants:
 
 * Basic rights (`basic`)
 * High-volume editing (`highvolume`)
