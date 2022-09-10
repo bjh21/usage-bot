@@ -8,8 +8,11 @@ def canonicalise_name(name):
     # it off.
     name = unquote(name).replace("_", " ")
     name = re.sub(r"^File:\s*", "", name, flags=re.IGNORECASE)
-    # XXX Should upcase the first character, but I need to check
-    # precisely how MediaWiki does that.
+    if len(name) > 0:
+        # This is not the proper way to capitalise a string, since it
+        # messes up characters with a titlecase form.  It seems to
+        # match what MediaWiki does, though.
+        name = name[0].upper() + name[1:]
     return name
             
 def summary_revision():
