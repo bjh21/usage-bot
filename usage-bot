@@ -8,12 +8,13 @@ import pywikibot.pagegenerators as pg
 import mwparserfromhell
 import re
 
-from usage_bot import from_args
+from usage_bot import from_args, canonicalise_name, summary_revision
 
 MAX_FILES_PER_GALLERY = 1000
 
-def get_existing_galleries(base_gallery):
-    gen = pg.PrefixingPageGenerator(f"{base_gallery}/", content=True)
+def get_existing_galleries(site, base_gallery):
+    gen = pg.PrefixingPageGenerator(f"{base_gallery}/",
+                                    site=site, content=True)
     gen = pg.RegexFilterPageGenerator(
         gen, fr"^{re.escape(base_gallery)}/[1-9]\d*$", ignore_namespace=False)
     gallery_files = { }
@@ -25,40 +26,68 @@ def get_existing_galleries(base_gallery):
             # I don't think mwparserfromhell understands the contents
             # of <gallery>, so we have to parse it ourselves.
             for line in gall.contents.splitlines():
-                files.add(line.split('|', 1)[0].strip())
+                files.add(canonicalise_name(line.split('|', 1)[0].strip()))
         files.discard('') # Blank lines in galleries are ignored
         gallery_files[int(p.title().split('/')[-1])] = files
     return gallery_files
 
-def update_galleries(files, base_gallery):
+def update_galleries(files, site, base_gallery):
     extra_summary = files.editsummary if hasattr(files, 'editsummary') else ""
+    extra_summary += summary_revision()
     bot.log(f"Extra edit summary: {extra_summary!r}")
-    site = pywikibot.Site()
     bot.log(f"{base_gallery}: {len(files)} files in use")
-    gallery_files = get_existing_galleries(base_gallery)
+    gallery_files = get_existing_galleries(site, base_gallery)
     bot.log(f"{base_gallery}: "
             f"{sum(map(len, gallery_files.values()))} "
             "files in galleries already")
     files_set = set(files.keys())
     # Find the files we want that aren't in any gallery.
     added_files_queue = sorted(files_set.difference(*gallery_files.values()))
-    bot.log(f"{base_gallery}: {len(added_files_queue)} new files")
+    def edit_summary(nstart, nunused, ndupe, nadded):
+        s = ""
+        if nunused == 1: s += ", removed 1 unused file"
+        if nunused > 1:  s += f", removed {nunused} unused files"
+        if ndupe == 1: s += ", removed 1 duplicate file"
+        if ndupe > 1:  s += f", removed {ndupe} duplicate files"
+        if nadded == 1: s += ", added 1 file"
+        if nadded > 1: s += f", added {nadded} files"
+        if nstart == 0: s = s.replace(" added ", " created new gallery with ")
+        s = s.lstrip(", ").capitalize()
+        s += extra_summary
+        bot.log(f"Edit summary: {s}")
+        return s
+    def update_gallery(n):
+        before = gallery_files[n].copy()
+        # We have decided to update this gallery.
+        nstart = len(gallery_files[n])
+        # Remove files that aren't used any more.
+        gallery_files[n].intersection_update(files_set)
+        nunused = nstart - len(gallery_files[n])
+        # Remove files that appear in other galleries.
+        gallery_files[n].difference_update(
+            *[v for k, v in gallery_files.items() if k != n])
+        ndupe = nstart - nunused - len(gallery_files[n])
+        bot.log(f"Removing {nunused} unused files and {ndupe} duplicates "
+                f"from {base_gallery}/{n}")
+        space = MAX_FILES_PER_GALLERY - len(gallery_files[n])
+        bot.log(f"{base_gallery}/{n} has room for {space} more files")
+        gallery_files[n].update(added_files_queue[:space])
+        del added_files_queue[:space]
+        nadded = len(gallery_files[n]) - nstart + nunused + ndupe
+        bot.log(f"Saving {base_gallery}/{n} with {len(gallery_files[n])} files")
+        save_gallery(site, f"{base_gallery}/{n}", gallery_files[n], files,
+                     edit_summary(nstart, nunused, ndupe, nadded))
     # First pass: find galleries that must be edited to remove files,
     # remove those files, and fill the galleries up.
     for n, these_files in sorted(gallery_files.items()):
-        nremoved = len(these_files - files_set)
-        if nremoved > 0:
-            bot.log(f"{base_gallery}/{n} needs {nremoved} files removed")
-            these_files.intersection_update(files_set)
-            space = MAX_FILES_PER_GALLERY - len(these_files)
-            bot.log(f"{base_gallery}/{n} has room for {space} more files")
-            these_files.update(added_files_queue[:space])
-            update_gallery(f"{base_gallery}/{n}", these_files, files,
-                           f"Removed {nremoved} files and added "
-                           f"{len(added_files_queue[:space])}{extra_summary}")
-            del added_files_queue[:space]
+        if these_files - files_set:
+            bot.log(f"{base_gallery}/{n} needs files removed")
+            update_gallery(n)
     bot.log(f"{base_gallery}: {len(added_files_queue)} files still to add")
-    # Now sort the galleries by free space
+    # Now sort the galleries by free space.  We could try to account
+    # for duplicates here, but that's tricky to do across the whole
+    # lot since they may duplicate one another.  Easier just to be
+    # pleasantly suprised.
     def by_free_space(item):
         return MAX_FILES_PER_GALLERY - len(item[1])
     for n, these_files in sorted(gallery_files.items(),
@@ -68,12 +97,8 @@ def update_galleries(files, base_gallery):
             return
         space = MAX_FILES_PER_GALLERY - len(these_files)
         if space < len(added_files_queue) % MAX_FILES_PER_GALLERY: break
-        bot.log(f"{base_gallery}/{n} has room for {space} more files")
-        these_files.update(added_files_queue[:space])
-        update_gallery(f"{base_gallery}/{n}", these_files, files,
-                       f"Added {len(added_files_queue[:space])} files"
-                       f"{extra_summary}")
-        del added_files_queue[:space]
+        bot.log(f"{base_gallery}/{n} has room for at least {space} more files")
+        update_gallery(n)
     # Remaining space in existing galleries is too small to use
     # efficiently, so make new galleries.
     bot.log(f"{base_gallery}: {len(added_files_queue)} files still to add")
@@ -82,18 +107,24 @@ def update_galleries(files, base_gallery):
                                      MAX_FILES_PER_GALLERY),
                               start = max(gallery_files.keys(), default=0) + 1):
         bot.log(f"creating {base_gallery}/{n} with {len(chunk)} files")
-        update_gallery(f"{base_gallery}/{n}", chunk, files,
-                       f"Created new gallery with {len(chunk)} files"
-                       f"{extra_summary}")
+        save_gallery(site, f"{base_gallery}/{n}", chunk, files,
+                     edit_summary(0, 0, 0, len(chunk)))
 
-def update_gallery(name, files, captions, summary):
-    site = pywikibot.Site()
+def save_gallery(site, name, files, captions, summary):
+    def for_gallery(filename):
+        # Disambiguate filenames that start with "File:", i.e. where
+        # the page title starts "File:File:".  No such files exist on
+        # Commons, but we want to ensure that attempts at using them
+        # don't accidentally mark unused files as used.
+        if re.match(r'^File:', filename, re.IGNORECASE):
+            return "File:" + filename
+        return filename
     """name is the name of the gallery
        files is a collection of files it should have
        captions is the full dictionary of captions"""
     gallery = pywikibot.Page(site, name)
     gallery.text = ("{{../header}}\n<gallery>\n" +
-                    "".join([f"{filename}|{captions[filename]}\n"
+                    "".join([f"{for_gallery(filename)}|{captions[filename]}\n"
                              for filename in sorted(files)]) +
                     "</gallery>\n")
     try:
@@ -109,10 +140,16 @@ def main(*args):
 
     files = from_args(local_args)
     if '-osm' in local_args:
-        update_galleries(files, "Commons:Files used on OpenStreetMap")
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used on OpenStreetMap")
     elif '-osmwiki' in local_args:
-        update_galleries(files, "Commons:Files used on the OpenStreetMap Wiki")
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used on the OpenStreetMap Wiki")
+    elif '-osmwikibase' in local_args:
+        update_galleries(files, pywikibot.Site("osm:en"),
+                         "Wiki:Files used by data items")
     elif '-wikitech' in local_args:
-        update_galleries(files, "Commons:Files used on Wikitech")
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used on Wikitech")
 
 main()

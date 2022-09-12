@@ -9,4 +9,12 @@ workdir="$(mktemp -t -d "usage-bot-XXXXXX")"
 
 py="${workdir}/venv/bin/python3"
 
+"${workdir}"/venv/bin/pwb login.py -all -v -log
+
+# From here on, scripts are not dependent on one another, so ignore
+# errors.
+set +e
+
+"${py}" usage-bot -osmwikibase -v -log
 "${py}" usage-bot -wikitech -v -log
+"${py}" usage-bot -osmwiki -v -log
