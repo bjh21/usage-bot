@@ -145,11 +145,32 @@ def main(*args):
     elif '-osmwiki' in local_args:
         update_galleries(files, pywikibot.Site("commons"),
                          "Commons:Files used on the OpenStreetMap Wiki")
-    elif '-osmwikibase' in local_args:
-        update_galleries(files, pywikibot.Site("osm:en"),
-                         "Wiki:Files used by data items")
     elif '-wikitech' in local_args:
         update_galleries(files, pywikibot.Site("commons"),
                          "Commons:Files used on Wikitech")
+    elif '-wmat' in local_args:
+        update_galleries(files, pywikibot.Site("commons"),
+                    "Commons:Files used on Wikimedia Österreich Mitglieder")
+    elif '-wmau' in local_args:
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used by Wikimedia Australia")
+    elif '-wmczold' in local_args:
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used by Wikimedia Czech Republic")
+    elif '-wmau' in local_args:
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used by Wikimedia Australia")
+    elif '-wmdc' in local_args:
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used by Wikimedia District of Columbia")
+    elif '-wmhu' in local_args:
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used by Wikimédia Magyarország")
+    elif '-wmuk' in local_args:
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used by Wikimedia UK")
+    elif '-osmwikibase' in local_args:
+        update_galleries(files, pywikibot.Site("osm:en"),
+                         "Wiki:Files used by data items")
 
 main()
