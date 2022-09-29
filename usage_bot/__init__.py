@@ -12,6 +12,9 @@ def filter_files(files):
             del files[title]
 
 def from_args(args):
+    # Process global arguments in case we've using a MediaWiki target.
+    args = pywikibot.handle_args(args)
+
     if '-osm' in args:
         files = from_taginfo()
     elif '-osmwiki' in args:
