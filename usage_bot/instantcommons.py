@@ -1,8 +1,22 @@
 import pywikibot.data.api as api
+import pywikibot.bot as bot
 import pywikibot
+
+class NoRepoError(Exception):
+    pass
 
 class from_instantcommons(dict):
     def __init__(self, site, iwprefix=None):
+        # Find out how this wiki refers to Commons.
+        r = api.Request(site, parameters=dict(action='query',
+                                              meta='filerepoinfo',
+                                              friprop='name|server'))
+        commons_ids = [repo['name'] for repo in r.submit()['query']['repos']
+                       if repo.get('server') == '//commons.wikimedia.org']
+        if len(commons_ids) == 0:
+            raise(NoRepoError("No repository found with "
+                              "server=//commons.wikimedia.org"))
+        bot.log(f"Commons repo id(s): {commons_ids}")
         # Logically, we could use a PageGenerator here, but we only want a
         # couple of values and want to minimise load on the target.
         parameters = dict(
@@ -17,7 +31,7 @@ class from_instantcommons(dict):
             # name of Commons on this wiki, but InstantCommons seems
             # to always use "wikimediacommons" so for now we just spot
             # that.
-            if f['imagerepository'] == 'wikimediacommons':
+            if f['imagerepository'] in commons_ids:
                 # Other wikis might have their own namespace prefix in
                 # place of "File:", but those won't work on Commons.
                 # Assume that everything up to the first colon is the
