@@ -24,4 +24,5 @@ set +e
 "${py}" usage-bot -wmdc -v -log
 "${py}" usage-bot -wmhu -v -log
 "${py}" usage-bot -wmuk -v -log
+"${py}" usage-bot -regiowiki -step:100 -v -log
 "${py}" usage-bot -osmwiki -v -log

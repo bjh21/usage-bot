@@ -169,6 +169,9 @@ def main(*args):
     elif '-wmuk' in local_args:
         update_galleries(files, pywikibot.Site("commons"),
                          "Commons:Files used by Wikimedia UK")
+    elif '-regiowiki' in local_args:
+        update_galleries(files, pywikibot.Site("commons"),
+                         "Commons:Files used on RegiowikiAT")
     elif '-osmwikibase' in local_args:
         update_galleries(files, pywikibot.Site("osm:en"),
                          "Wiki:Files used by data items")
