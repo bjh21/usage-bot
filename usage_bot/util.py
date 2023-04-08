@@ -2,9 +2,9 @@ import re
 from subprocess import run, CalledProcessError, PIPE
 from urllib.parse import unquote
 
-# MediaWiki seems to use a casing table from Unicode 8.0.0 or 9.0.0.
+# MediaWiki seems to use a casing table from Unicode 9.0.0 or 10.0.0
 # These are the characters that gained a Simple_Uppercase_Mapping
-# between Unicode 9.0.0 and Unicode 15.0.0.  For compatibility with
+# between Unicode 10.0.0 and Unicode 15.0.0.  For compatibility with
 # MediaWiki, we shouldn't up-case these characters at the start of
 # filenames.
 suppress_casing = {
