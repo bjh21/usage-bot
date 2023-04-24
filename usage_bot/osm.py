@@ -12,7 +12,6 @@ class from_taginfo(dict):
     def from_key(self, key, allowurls=False):
         page = 1
         rp = 999
-        data = []
         while True:
             r = http.fetch(urljoin(self.baseurl, "api/4/key/values"),
                            params={'key': key, 'page': page, 'rp': rp})
