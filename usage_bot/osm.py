@@ -10,28 +10,34 @@ class from_taginfo(dict):
         self.from_key("wikimedia_commons")
         self.from_key("image", allowurls=True)
     def from_key(self, key, allowurls=False):
-        r = http.fetch(urljoin(self.baseurl, "api/4/key/values"),
-                       params={'key': key})
-        r.raise_for_status()
-        j = r.json()
-        for v in j["data"]:
-            title = v["value"]
-            if allowurls:
-                # image=* might be either a Commons page title or a URL
-                m = re.match("^https?://commons.wikimedia.org/wiki/"
-                             "(File:[^#?]*)",
-                             title, re.IGNORECASE)
-                if m:
-                    title = m[1]
-            if re.match("^File:", title, re.IGNORECASE):
-                params = urlencode(dict(key=key, value=v['value']))
-                tiurl = urljoin(self.baseurl, "tags/?" + params)
-                title = canonicalise_name(title)
-                if title in self:
-                    self[title] += "<br/>"
-                else:
-                    self[title] = ""
-                self[title] += (f"[{tiurl} {key}={v['value']}]")
+        page = 1
+        rp = 999
+        data = []
+        while True:
+            r = http.fetch(urljoin(self.baseurl, "api/4/key/values"),
+                           params={'key': key, 'page': page, 'rp': rp})
+            r.raise_for_status()
+            j = r.json()
+            if j["data"] == []: break
+            page += 1
+            for v in j["data"]:
+                title = v["value"]
+                if allowurls:
+                    # image=* might be either a Commons page title or a URL
+                    m = re.match("^https?://commons.wikimedia.org/wiki/"
+                                 "(File:[^#?]*)",
+                                 title, re.IGNORECASE)
+                    if m:
+                        title = m[1]
+                if re.match("^File:", title, re.IGNORECASE):
+                    params = urlencode(dict(key=key, value=v['value']))
+                    tiurl = urljoin(self.baseurl, "tags/?" + params)
+                    title = canonicalise_name(title)
+                    if title in self:
+                        self[title] += "<br/>"
+                    else:
+                        self[title] = ""
+                    self[title] += (f"[{tiurl} {key}={v['value']}]")
     def get_editsummary(self):
         r = http.fetch(urljoin(self.baseurl, "api/4/site/info"))
         r.raise_for_status()
