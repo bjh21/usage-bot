@@ -27,10 +27,6 @@ class from_instantcommons(dict):
             parameters['inprop'] = 'url'
         g = api.QueryGenerator(site=site, parameters=parameters)
         for f in g:
-            # Properly, we should query meta=filerepoinfo to find the
-            # name of Commons on this wiki, but InstantCommons seems
-            # to always use "wikimediacommons" so for now we just spot
-            # that.
             if f['imagerepository'] in commons_ids:
                 # Other wikis might have their own namespace prefix in
                 # place of "File:", but those won't work on Commons.
