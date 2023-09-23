@@ -50,6 +50,8 @@ def from_args(args):
     elif '-regiowiki' in args:
         files = from_instantcommons(pywikibot.Site("regiowiki:de"),
                                     iwprefix="regiowiki")
+    elif '-aaroads' in args:
+        files = from_instantcommons(pywikibot.Site("aaroads:en"))
     elif '-osmwikibase' in args:
         # Empty iwprefix assumes page will go on OSM Wiki
         files = from_wikibase(pywikibot.Site("osm:en"), iwprefix="")
