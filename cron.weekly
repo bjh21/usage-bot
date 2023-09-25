@@ -25,5 +25,5 @@ set +e
 "${py}" usage-bot -wmhu -v -log
 "${py}" usage-bot -wmuk -v -log
 "${py}" usage-bot -regiowiki -step:100 -v -log
-"${py}" usage-bot -aaroads -step:50 -v -log
+"${py}" usage-bot -aaroads -step:20 -v -log
 "${py}" usage-bot -osmwiki -v -log
